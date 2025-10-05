@@ -1,0 +1,8 @@
+The solution is organised into clear bounded contexts. The \*\*Fee Service\*\* authenticates with the external school API and maps incoming fee data into the internal domain, publishing events to keep the system up to date. The \*\*Ledger Service\*\* consumes these events and acts as the source of truth for balances and outstanding obligations. The \*\*Payment Service\*\* orchestrates parent interactions, validating requests, querying the ledger for account data, and sending charges to the \*\*Payment Gateway\*\*, which abstracts third-party providers. The \*\*Comms Service\*\* listens for fee and payment events to deliver notifications, while the \*\*Identity and Accounts Service\*\* issues OAuth2/JWT tokens and enforces authorisation rules such as parent–student relationships. All communication between services is event-driven to keep contexts decoupled.  
+
+
+
+\*\*Reliability and correctness\*\* are ensured through idempotent fee upserts keyed by external identifiers, and payment operations protected by `Idempotency-Key` headers to prevent double charges. Events are published via an outbox pattern with retries and dead-letter queues to guarantee delivery. \*\*Security\*\* is enforced with OAuth2/JWT authentication on all requests, role-based authorisation, and careful handling of PII (encrypted at rest, redacted in logs). Payment data is tokenised, never storing raw card information. \*\*Observability\*\* is provided through structured logs, distributed traces, and metrics in a platform such as New Relic, focusing on authentication failures, idempotency hit/miss rates, event queue health, and payment success/failure tracking.  
+
+
+
