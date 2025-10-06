@@ -1,4 +1,5 @@
 
+
 # SchoolFees – Pay Now API Slice (DDD / Onion Architecture)
 
 This project implements a small **Domain-Driven Design (DDD)** and **Onion Architecture** slice for handling school fee payments.  
@@ -9,7 +10,7 @@ It demonstrates clean layering, idempotency, CQRS-style application logic, EF Co
 ## Use Case
 
 **Endpoint:** `POST /fees/{studentId}/payments`  
-**Request body:**
+**Request body:**  
 ```json
 {
   "amount": 120.50,
@@ -34,27 +35,40 @@ Tests	Unit and integration tests using NUnit + FluentAssertions.
 t outer layers.
 
 
-Clone and build
-bash
-Copy code
-git clone https://github.com/yourname/SchoolFees.git
-cd SchoolFees
-dotnet build
+**Clone and build**
+ - bash   
+ - git clone https://github.com/yourname/SchoolFees.git  
+ - cd   SchoolFees   
+ - dotnet build
 
-Run the API
-bash
-Copy code
-cd src/SchoolFees.Api
-dotnet run
+**Run the API**
+ - cd SchoolFees.Api  
+ - dotnet run
 
-Test the endpoint
-bash
-Copy code
-curl -X POST "https://localhost:5001/fees/{studentId}/payments" \
--H "Content-Type: application/json" \
--H "Idempotency-Key: abc-123" \
--d '{"amount":120.50,"method":"Card"}'
+**Test the endpoint**
 
+in powershell 7:
+
+
+$headers = @{
+  "Content-Type" = "application/json"
+  "Idempotency-Key" = "abc-123"
+}
+
+$body = '{"amount":120.50,"method":"Card"}'
+
+Invoke-RestMethod -Uri "http://localhost:5054/fees/6c47f301-d911-4c3b-81ff-8b3fc08e6163/payments" `
+  -Method POST `
+  -Headers $headers `
+  -Body $body `
+  
+  
+  dotnet dev-certs https --trust
+  Invoke-RestMethod -Uri "https://localhost:7042/fees/6c47f301-d911-4c3b-81ff-8b3fc08e6163/payments" `
+  -Method POST `
+  -Headers $headers `
+  -Body $body `
+  -SkipCertificateCheck
 Response:
 
 ```json

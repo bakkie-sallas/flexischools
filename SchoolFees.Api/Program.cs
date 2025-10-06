@@ -12,7 +12,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 // Configure Entity Framework and repositories
-builder.Services.AddDbContext<FeesDbContext>(o => o.UseSqlite("DataSource=:memory:"));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? $"DataSource=SchoolFees.db";
+
+builder.Services.AddDbContext<FeesDbContext>(options =>
+{
+    if (builder.Environment.IsEnvironment("Testing"))
+    {
+        // Use in-memory database for integration tests
+        options.UseSqlite($"DataSource=TestDb_{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+    }
+    else
+    {
+        // Use persistent database for production and development
+        options.UseSqlite(connectionString);
+    }
+});
+
 builder.Services.AddScoped<IPaymentRepository, EfPaymentRepository>();
 builder.Services.AddScoped<IIdempotencyStore, EfIdempotencyStore>();
 
@@ -21,6 +37,8 @@ builder.Services.AddSingleton<MetricsService>();
 builder.Services.AddSingleton<IMetricsService>(provider => provider.GetRequiredService<MetricsService>());
 builder.Services.AddScoped<IMetricsTracker>(provider => provider.GetRequiredService<MetricsService>());
 builder.Services.AddScoped<CreatePaymentHandler>();
+
+
 
 var app = builder.Build();
 
