@@ -1,13 +1,6 @@
 using SchoolFees.Domain;
 
 namespace SchoolFees.Application.Payments;
-
-public interface IMetricsTracker
-{
-    void IncrementPaymentCreated();
-    void IncrementIdempotencyHit();
-}
-
 public class CreatePaymentHandler
 {
     private readonly IPaymentRepository _paymentRepository;
